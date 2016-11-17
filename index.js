@@ -1,32 +1,30 @@
 'use strict';
 
-//QUESTO MODULO PERMETTE DI ACCEDERE AL FILESYSTEM DELLA MACCHINA
-//E SCRIVERE / LEGGERE FILES
-//NON VA INSTALLATO PERCHE' E' GIA' INCLUSO IN NODE.JS
-const fs = require('fs'); 
+const fs = require('fs');
 
+const writeStudent = (student, callback) => {
+	if (!student.name || !student.surname) return callback('You must specify name AND surname');
+	let id = student.name + student.surname;
+	let path = './' + id + '.json';
+	let body = JSON.stringify(student);
+	fs.writeFile(path, body, (err) => {
+		if (err) return callback(err);
+		callback(null, { path: path, message: 'Writing Completed' });
+	})
+};
 
-//FUNZIONE CHE LEGGE IL FILE JSON E RITORNA L'OGGETTO JAVASCRIPT
-const leggiPersonaggio = (path) => {
-	return require(path);
+const example = {
+	name: 'Pinco',
+	surname: 'Pallino',
+	age: 18
+};
+const bad = {
+	nam: 'fool',
+	surnme: 'bar'
 }
 
-//FUNZIONE CHE CREA L'OGGETTO JSON E LO TRASFORMA IN UNA STRINGA JSON
-const creaPersonaggio = (nome, cognome, forza) => {
-	if (typeof nome !== 'string' || typeof cognome !== 'string') return console.log('Nome e cognome devono essere stringhe');
-	if (typeof forza !== 'number') return console.log('Forza deve essere un numero');
-	const personaggio = {
-		nome: nome,
-		cognome: cognome,
-		forza: forza
-	}
-	const personaggioJSON = JSON.stringify(personaggio);
-	try {
-		fs.writeFileSync('./personaggi/' + nome + '.json', personaggioJSON);
-	} catch(ex) {
-		return console.log(ex);
-	}
-	return 'OK';
-}
-
-console.log(creaPersonaggio('Jian','Zhou',9000));
+writeStudent(bad, (err, data) => {
+	if (err) return console.log(err);
+	console.log(data.message);
+});
+console.log('Writing student');
